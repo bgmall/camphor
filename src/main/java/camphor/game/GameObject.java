@@ -16,7 +16,6 @@ public final class GameObject implements Component {
     private final String type;
     private final long id;
     private STATE state = STATE.CLOSED;
-    private GameObject parent;
     private ArrayList<Component> components;
     private Map<String, Component> tags;
 
@@ -35,14 +34,6 @@ public final class GameObject implements Component {
 
     GameObjectManager getManager() {
         return manager;
-    }
-
-    GameObject getRoot() {
-        return (parent == null) ? this : parent.getRoot();
-    }
-
-    boolean isRoot() {
-        return parent == null;
     }
 
     void addComponent(Component component) {
@@ -85,27 +76,16 @@ public final class GameObject implements Component {
         return component;
     }
 
-    void removeComponent(String tag) {
-        Component component = getTagged(tag);
-        if (component instanceof GameObject) {
-            getManager().destroyGameObject((GameObject) component);
-        } else {
-            component.destroy();
-        }
+    void createComponents() {
+
     }
 
-    GameObject createGameObject(String type, String tag, long id) throws GameObjectCreateException {
-        GameObject gameObject = manager.createGameObject(type, id);
-        gameObject.setParent(this);
-        addComponent(gameObject, tag);
-        return gameObject;
+    void removeComponent(String tag) {
+        Component component = getTagged(tag);
+        component.destroy();
     }
 
     public void addGameEventListener(String eventId, GameEventListener listener) {
-        if (!isRoot()) {
-            getRoot().addGameEventListener(eventId, listener);
-            return;
-        }
         if (eventManager == null) {
             eventManager = new GameEventManager();
         }
@@ -113,24 +93,9 @@ public final class GameObject implements Component {
     }
 
     public void removeGameEventListener(String eventId, GameEventListener listener) {
-        if (!isRoot()) {
-            getRoot().removeGameEventListener(eventId, listener);
-        }
         if (eventManager != null) {
             eventManager.removeGameEventListener(eventId, listener);
         }
-    }
-
-    private void setParent(GameObject parent) {
-        this.parent = parent;
-        if (eventManager != null) {
-            getRoot().eventManager.addGameEventListeners(eventManager);
-        }
-    }
-
-    @Override
-    public GameObject getParent() {
-        return this.parent;
     }
 
     @Override
@@ -213,10 +178,6 @@ public final class GameObject implements Component {
 
     @Override
     public void sendGameEvent(GameEvent<?> event) {
-        if (!isRoot()) {
-            getRoot().sendGameEvent(event);
-            return;
-        }
         this.handleGameEvent(event);
     }
 
@@ -231,20 +192,6 @@ public final class GameObject implements Component {
     @Override
     public void fireGameEvent(GameEvent<?> event) {
         getManager().getGameService().getEventManager().fireGameEvent(event);
-    }
-
-    @Override
-    public <H> void sendReplyEvent(GameEvent<?> event, ReplyHandler<H> handler) {
-        event.setReplyHandler(handler);
-        sendGameEvent(event);
-    }
-
-    @Override
-    public <H> void sendReplyEvent(GameEvent<?> event, long receiverId, ReplyHandler<H> handler) {
-        GameObject gameObject = getManager().getGameObjectById(receiverId);
-        if (gameObject != null) {
-            gameObject.sendReplyEvent(event, handler);
-        }
     }
 
     @Override

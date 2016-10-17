@@ -1,5 +1,7 @@
 package camphor.game;
 
+import io.vertx.core.AbstractVerticle;
+
 /**
  * Created by Administrator on 2016/10/16.
  */

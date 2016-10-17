@@ -11,7 +11,6 @@ public abstract class AbstractComponent implements Component {
         this.parent = parent;
     }
 
-    @Override
     public GameObject getParent() {
         return this.parent;
     }
@@ -42,13 +41,5 @@ public abstract class AbstractComponent implements Component {
 
     public void fireGameEvent(GameEvent<?> event) {
         parent.fireGameEvent(event);
-    }
-
-    public <H> void sendReplyEvent(GameEvent<?> event, ReplyHandler<H> handler) {
-        parent.sendReplyEvent(event, handler);
-    }
-
-    public <H> void sendReplyEvent(GameEvent<?> event, long receiverId, ReplyHandler<H> handler) {
-        parent.sendReplyEvent(event, receiverId, handler);
     }
 }

@@ -95,19 +95,6 @@ public class GameEventManager {
 		handlePendingListeners();
 	}
 
-	void addGameEventListeners(GameEventManager eventManager) {
-		for (String eventId : eventManager.listeners.keySet()) {
-			List<GameEventListener> gameEventListeners = eventManager.listeners.get(eventId);
-			addGameEventListeners(eventId, gameEventListeners);
-		}
-	}
-
-	private void addGameEventListeners(String eventId, List<GameEventListener> gameEventListeners) {
-		for (GameEventListener listener : gameEventListeners) {
-			addGameEventListener(eventId, listener);
-		}
-	}
-
 	private void handlePendingListeners() {
 		
 		PendingListener cur;
